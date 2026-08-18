@@ -1,0 +1,130 @@
+package com.kjwang24.aoty.repository;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.time.LocalDateTime;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import com.kjwang24.aoty.entity.User;
+import com.kjwang24.aoty.entity.ListeningRecord;
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+public class ListeningRecordRepositoryTest {
+
+    @Autowired
+    private ListeningRecordRepository listeningRecordRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Test
+    void existsByUserAndSpotifyIdAndPlayedAt_returnsBoolean() {
+        User user = new User();
+        user.setUsername("kjwang24");
+        userRepository.save(user);
+
+        ListeningRecord record = new ListeningRecord();
+        record.setUser(user);
+        LocalDateTime time = LocalDateTime.now();
+        record.setPlayedAt(time);
+        record.setSpotifyId("prom");
+        listeningRecordRepository.save(record);
+
+        Boolean status = listeningRecordRepository.existsByUserAndSpotifyIdAndPlayedAt(user, "prom", time);
+        assertThat(status).isTrue();
+    }
+
+    @Test
+    void findAllByUserAndPlayedAtAfter_returnsCorrectUser() {
+        User user1 = new User();
+        user1.setUsername("user1");
+        userRepository.save(user1);
+
+        User user2 = new User();
+        user2.setUsername("user2");
+        userRepository.save(user2);
+
+        ListeningRecord listeningRecord1 = new ListeningRecord();
+        listeningRecord1.setUser(user1);
+        listeningRecord1.setPlayedAt(LocalDateTime.of(2026, 8, 2, 0, 0));
+        listeningRecordRepository.save(listeningRecord1);
+
+        ListeningRecord listeningRecord2 = new ListeningRecord();
+        listeningRecord2.setUser(user2);
+        listeningRecord2.setPlayedAt(LocalDateTime.of(2026, 8, 2, 0, 0));
+        listeningRecordRepository.save(listeningRecord2);
+
+        List<ListeningRecord> records = listeningRecordRepository.findAllByUserAndPlayedAtAfter(user1, LocalDateTime.of(2026, 8, 1, 0, 0));
+
+        assertThat(records).isEqualTo(List.of(listeningRecord1));
+    }
+
+    @Test
+    void findAllByUserAndPlayedAtAfter_returnsLaterRecords() {
+        User user = new User();
+        user.setUsername("kjwang24");
+        userRepository.save(user);
+
+        ListeningRecord early1 = new ListeningRecord();
+        early1.setUser(user);
+        early1.setSongName("pilot jones");
+        early1.setPlayedAt(LocalDateTime.of(2026, 7, 15, 13, 0));
+        listeningRecordRepository.save(early1);
+
+        ListeningRecord late1 = new ListeningRecord();
+        late1.setUser(user);
+        late1.setSongName("swim between trees");
+        late1.setPlayedAt(LocalDateTime.of(2026, 8, 10, 13, 0));
+        listeningRecordRepository.save(late1);
+
+        ListeningRecord late2 = new ListeningRecord();
+        late2.setUser(user);
+        late2.setSongName("going kokomo");
+        late2.setPlayedAt(LocalDateTime.of(2026, 8, 11, 13, 0));
+        listeningRecordRepository.saveAndFlush(late2);
+
+        LocalDateTime cutoff = LocalDateTime.of(2025, 8, 1, 0, 0);
+
+        List<ListeningRecord> records = listeningRecordRepository.findAllByUserAndPlayedAtAfter(user, cutoff);
+        List<String> recordNames = new ArrayList<String>(records.stream()
+                                   .map(ListeningRecord::getSongName)
+                                   .toList());
+        recordNames.sort(null);
+
+        List<String> expectedRecordNames = List.of("going kokomo", "swim between trees");
+
+        assertThat(recordNames).isEqualTo(expectedRecordNames);
+    }
+
+    @Test
+    void findByUserAndSpotifyIdAndPlayedAt_noDuplicateEntries() {
+        User user = new User();
+        user.setUsername("kjwang24");
+        userRepository.save(user);
+
+        LocalDateTime time = LocalDateTime.of(2026, 8, 1, 0, 0);
+
+        ListeningRecord original = new ListeningRecord();
+        original.setUser(user);
+        original.setSpotifyId("superscar");
+        original.setPlayedAt(time);
+        listeningRecordRepository.saveAndFlush(original);
+
+        ListeningRecord duplicate = new ListeningRecord();
+        duplicate.setUser(user);
+        duplicate.setSpotifyId("superscar");
+        duplicate.setPlayedAt(time);
+
+        assertThatThrownBy(() -> listeningRecordRepository.saveAndFlush(duplicate))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+}

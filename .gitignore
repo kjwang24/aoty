@@ -1,0 +1,13 @@
+TODO.md
+.vscode/
+
+# builds
+target/
+*.class
+
+# local secrets/config overrides
+application-local.properties
+.env
+
+# os
+.DS_Store
