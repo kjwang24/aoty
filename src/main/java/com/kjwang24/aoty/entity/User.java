@@ -26,14 +26,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
-    
-	@Column(unique = true)
-    private String username;
 
 	@Column(unique = true)
-	private String email;
-	
-	private String firstname;
+	private String accountId;
+
+	private String displayName;
 
     @OneToMany(mappedBy = "user")
     private List<Entry> entries;

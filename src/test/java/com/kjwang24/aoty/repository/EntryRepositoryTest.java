@@ -28,7 +28,7 @@ public class EntryRepositoryTest {
     @Test
     void findByUserAndDate_returnsSavedEntry() {
         User user = new User();
-        user.setUsername("kjwang24");
+        user.setAccountId("kjwang24");
         userRepository.save(user);
 
         Entry entry = new Entry();
@@ -39,14 +39,14 @@ public class EntryRepositoryTest {
 
         Optional<Entry> result = entryRepository.findByUserAndDate(user, date);
         assertThat(result).isPresent();
-        assertThat(result.get().getUser().getUsername()).isEqualTo("kjwang24");
+        assertThat(result.get().getUser().getAccountId()).isEqualTo("kjwang24");
         assertThat(result.get().getDate()).isEqualTo(date);
     }
 
     @Test
     void findByUserAndDate_noDuplicateEntries() {
         User user = new User();
-        user.setUsername("kjwang24");
+        user.setAccountId("kjwang24");
         userRepository.save(user);
 
         LocalDate date = LocalDate.now();
@@ -68,7 +68,7 @@ public class EntryRepositoryTest {
     @Test
     void findByUsername_returnsAllEntries() {
         User user = new User();
-        user.setUsername("kjwang24");
+        user.setAccountId("kjwang24");
 
         Entry yesterday = new Entry();
         yesterday.setDate(LocalDate.of(2026, 8, 14));

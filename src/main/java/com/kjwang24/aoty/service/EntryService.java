@@ -23,7 +23,7 @@ public class EntryService {
             throw new ForbiddenUpdateException("cannot create entries for future days");
         }
         if (entryRepository.findByUserAndDate(user, date).isPresent()) {
-            throw new DuplicateEntryException("an entry already exists for " + user.getUsername() + " on " + date);
+            throw new DuplicateEntryException("an entry already exists for user " + user.getId() + " on " + date);
         }
         Entry entry = new Entry();
         entry.setUser(user);
@@ -38,7 +38,7 @@ public class EntryService {
             throw new ForbiddenUpdateException("cannot edit the entries of days other than today");
         }
         Entry entry = entryRepository.findByUserAndDate(user, date)
-                      .orElseThrow(() -> new ForbiddenUpdateException("no entry exists yet for" + user.getUsername() + "today"));
+                      .orElseThrow(() -> new ForbiddenUpdateException("no entry exists yet for user " + user.getId() + " today"));
         spotifyId.ifPresent(entry::setSpotifyId);
         note.ifPresent(entry::setNote);
         return entryRepository.save(entry);

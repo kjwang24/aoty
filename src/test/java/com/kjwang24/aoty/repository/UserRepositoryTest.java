@@ -21,19 +21,17 @@ class UserRepositoryTest {
     @Test
     void findByUsername_returnsSavedUser() {
         User user = new User();
-        user.setUsername("kjwang24");
-        user.setEmail("kjwang24@spring.boot");
+        user.setAccountId("kjwang24");
         userRepository.save(user);
 
-        Optional<User> found = userRepository.findByUsername("kjwang24");
+        Optional<User> found = userRepository.findByAccountId("kjwang24");
 
         assertThat(found).isPresent();
-        assertThat(found.get().getEmail()).isEqualTo("kjwang24@spring.boot");
     }
 
     @Test
     void findByUsername_returnsEmpty_whenNoMatch() {
-        Optional<User> found = userRepository.findByUsername("doesNotExist");
+        Optional<User> found = userRepository.findByAccountId("doesNotExist");
 
         assertThat(found).isEmpty();
     }

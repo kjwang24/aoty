@@ -29,7 +29,7 @@ public class ListeningRecordRepositoryTest {
     @Test
     void existsByUserAndSpotifyIdAndPlayedAt_returnsBoolean() {
         User user = new User();
-        user.setUsername("kjwang24");
+        user.setAccountId("kjwang24");
         userRepository.save(user);
 
         ListeningRecord record = new ListeningRecord();
@@ -46,11 +46,11 @@ public class ListeningRecordRepositoryTest {
     @Test
     void findAllByUserAndPlayedAtAfter_returnsCorrectUser() {
         User user1 = new User();
-        user1.setUsername("user1");
+        user1.setAccountId("user1");
         userRepository.save(user1);
 
         User user2 = new User();
-        user2.setUsername("user2");
+        user2.setAccountId("user2");
         userRepository.save(user2);
 
         ListeningRecord listeningRecord1 = new ListeningRecord();
@@ -71,7 +71,7 @@ public class ListeningRecordRepositoryTest {
     @Test
     void findAllByUserAndPlayedAtAfter_returnsLaterRecords() {
         User user = new User();
-        user.setUsername("kjwang24");
+        user.setAccountId("kjwang24");
         userRepository.save(user);
 
         ListeningRecord early1 = new ListeningRecord();
@@ -92,7 +92,7 @@ public class ListeningRecordRepositoryTest {
         late2.setPlayedAt(LocalDateTime.of(2026, 8, 11, 13, 0));
         listeningRecordRepository.saveAndFlush(late2);
 
-        LocalDateTime cutoff = LocalDateTime.of(2025, 8, 1, 0, 0);
+        LocalDateTime cutoff = LocalDateTime.of(2026, 8, 1, 0, 0);
 
         List<ListeningRecord> records = listeningRecordRepository.findAllByUserAndPlayedAtAfter(user, cutoff);
         List<String> recordNames = new ArrayList<String>(records.stream()
@@ -108,7 +108,7 @@ public class ListeningRecordRepositoryTest {
     @Test
     void findByUserAndSpotifyIdAndPlayedAt_noDuplicateEntries() {
         User user = new User();
-        user.setUsername("kjwang24");
+        user.setAccountId("kjwang24");
         userRepository.save(user);
 
         LocalDateTime time = LocalDateTime.of(2026, 8, 1, 0, 0);

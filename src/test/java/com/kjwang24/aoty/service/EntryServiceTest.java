@@ -30,7 +30,7 @@ public class EntryServiceTest {
     @Test
     void createEntry_succeeds_forPastDayWithNoExistingEntry() {
         User user = new User();
-        user.setUsername("kjwang24");
+        user.setAccountId("kjwang24");
         LocalDate date = LocalDate.of(2026, 8, 1);
 
         when(entryRepository.findByUserAndDate(user, date)).thenReturn(Optional.empty());
@@ -46,7 +46,7 @@ public class EntryServiceTest {
     @Test
     void createEntry_fails_whenEntryAlreadyExists() {
         User user = new User();
-        user.setUsername("kjwang24");
+        user.setAccountId("kjwang24");
         LocalDate date = LocalDate.of(2026, 8, 1);
 
         Entry original = new Entry();
@@ -63,7 +63,7 @@ public class EntryServiceTest {
     @Test
     void updateEntry_fails_forPastDaysAndTodaysMissingEntry() {
         User user = new User();
-        user.setUsername("kjwang24");
+        user.setAccountId("kjwang24");
         LocalDate pastDate = LocalDate.of(2026, 8, 1);
 
         assertThatThrownBy(() -> entryService.updateEntry(user, pastDate, Optional.empty(), Optional.empty()))
@@ -75,7 +75,7 @@ public class EntryServiceTest {
     @Test
     void updateEntry_fails_forTodaysMissingEntry() {
         User user = new User();
-        user.setUsername("kjwang24");
+        user.setAccountId("kjwang24");
         LocalDate today = LocalDate.now();
         
         when(entryRepository.findByUserAndDate(user, today)).thenReturn(Optional.empty());
@@ -87,7 +87,7 @@ public class EntryServiceTest {
     @Test
     void updateEntry_succeeds_forTodaysExistingEntry() {
         User user = new User();
-        user.setUsername("kjwang24");
+        user.setAccountId("kjwang24");
         LocalDate today = LocalDate.now();
 
         Entry original = new Entry();
