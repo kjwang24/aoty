@@ -30,7 +30,7 @@ public class TokenRefreshService {
     private String clientSecret;
 
     public String getValidAccessToken(User user) {
-        SpotifyCredential cred = spotifyCredentialRepository.findByUser(user).orElseThrow(() -> new MissingCredentialsException("no creds exist for user " + user.getId()));
+        SpotifyCredential cred = spotifyCredentialRepository.findByUser(user).orElseThrow(() -> new IllegalStateException("no creds exist for user " + user.getId()));
 
         if (cred.getExpiresAt().isAfter(Instant.now())) {
             return cred.getAccessToken();

@@ -34,7 +34,7 @@ public class SpotifyAuthServiceTest {
     private SpotifyAuthService spotifyAuthService;
 
     @Test
-    public void loginWithNewAccount_createsUserAndCredential() {
+    void loginWithNewAccount_createsUserAndCredential() {
         when(userRepository.findByAccountId("kjwang24")).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(spotifyCredentialRepository.findByUser(any(User.class))).thenReturn(Optional.empty());
@@ -56,7 +56,7 @@ public class SpotifyAuthServiceTest {
     }
 
     @Test
-    public void loginWithExistingAccount_updatesExistingCredential() {
+    void loginWithExistingAccount_updatesExistingCredential() {
         User user = new User();
         user.setAccountId("kjwang24");
         user.setDisplayName("katherine");

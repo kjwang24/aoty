@@ -2,6 +2,7 @@ package com.kjwang24.aoty.entity;
 
 import java.time.Instant;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,8 +28,10 @@ public class SpotifyCredential {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
     private String accessToken;
 
+    @Column(columnDefinition = "TEXT")
     private String refreshToken;
 
     private Instant expiresAt;

@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.kjwang24.aoty.entity.Entry;
 import com.kjwang24.aoty.entity.User;
 import com.kjwang24.aoty.repository.EntryRepository;
+import com.kjwang24.aoty.service.EntryExceptions.DuplicateEntryException;
+import com.kjwang24.aoty.service.EntryExceptions.ForbiddenUpdateException;
 
 @ExtendWith(MockitoExtension.class)
 public class EntryServiceTest {

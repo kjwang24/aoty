@@ -1,6 +1,7 @@
 package com.kjwang24.aoty.service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.kjwang24.aoty.entity.Entry;
 import com.kjwang24.aoty.entity.User;
 import com.kjwang24.aoty.repository.EntryRepository;
+import com.kjwang24.aoty.service.EntryExceptions.DuplicateEntryException;
+import com.kjwang24.aoty.service.EntryExceptions.ForbiddenUpdateException;
 
 @Service
 public class EntryService {
@@ -42,6 +45,10 @@ public class EntryService {
         spotifyId.ifPresent(entry::setSpotifyId);
         note.ifPresent(entry::setNote);
         return entryRepository.save(entry);
+    }
+
+    public List<Entry> getAllEntries(User user) {
+        return entryRepository.findByUserOrderByDateAsc(user);
     }
 
 }

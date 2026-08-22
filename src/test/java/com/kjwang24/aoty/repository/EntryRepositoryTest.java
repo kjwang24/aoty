@@ -3,6 +3,7 @@ package com.kjwang24.aoty.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
 
@@ -64,11 +65,11 @@ public class EntryRepositoryTest {
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 
-    /* not sure if i need to be able to get all of a user's entries
     @Test
     void findByUsername_returnsAllEntries() {
         User user = new User();
         user.setAccountId("kjwang24");
+        userRepository.save(user);
 
         Entry yesterday = new Entry();
         yesterday.setDate(LocalDate.of(2026, 8, 14));
@@ -76,10 +77,10 @@ public class EntryRepositoryTest {
         entryRepository.save(yesterday);
         Entry today = new Entry();
         today.setDate(LocalDate.of(2026, 8, 15));
-        yesterday.setUser(user);
+        today.setUser(user);
         entryRepository.save(today);
         
-        entryRepository.findAllById(null)
+        assertThat(entryRepository.findByUserOrderByDateAsc(user)).isEqualTo(List.of(yesterday, today));
     }
-    */
+
 }
