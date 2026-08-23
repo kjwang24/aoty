@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateEntryException.class)
-    public ResponseEntity<?> handleDuplicateEntries(DuplicateEntryException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    public ResponseEntity<?> handleDuplicateEntries(DuplicateEntryException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(ForbiddenUpdateException.class)
-    public ResponseEntity<?> handleForbiddenUpdates(ForbiddenUpdateException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);
+    public ResponseEntity<?> handleForbiddenUpdates(ForbiddenUpdateException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
     }
 
 }

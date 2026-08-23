@@ -113,11 +113,11 @@ public class EntryControllerTest {
         when(userRepository.findByAccountId("kjwang24")).thenReturn(java.util.Optional.of(user));
         when(entryService.updateEntry(user, date, Optional.of("planes"), Optional.empty())).thenReturn(entry);
 
-        mockMvc.perform(patch("/entries/{date}")
+        mockMvc.perform(patch("/entries/{date}", date)
                .with(oauth2Login().attributes(attrs -> attrs.put("account_id", "kjwang24")))
                .with(csrf())
                .contentType(MediaType.APPLICATION_JSON)
-               .content(String.format("{\"date\":\"%s\",\"spotify_id\":\"planes\"}", date)))
+               .content(String.format("{\"spotify_id\":\"planes\"}")))
                .andExpect(status().isOk());
 
         verify(entryService).updateEntry(user, date, Optional.of("planes"), Optional.empty());
@@ -133,11 +133,11 @@ public class EntryControllerTest {
         when(entryService.updateEntry(user, date, Optional.of("400 lux"), Optional.empty()))
                 .thenThrow(new ForbiddenUpdateException(""));
 
-        mockMvc.perform(patch("/entries/{date}")
+        mockMvc.perform(patch("/entries/{date}", date)
                .with(oauth2Login().attributes(attrs -> attrs.put("account_id", "kjwang24")))
                .with(csrf())
                .contentType(MediaType.APPLICATION_JSON)
-               .content("{\"date\":\"2026-08-01\", \"spotify_id\":\"400 lux\"}"))
+               .content("{\"spotify_id\":\"400 lux\"}"))
                .andExpect(status().isForbidden());
     }
 

@@ -1,6 +1,6 @@
 package com.kjwang24.aoty.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -36,7 +36,7 @@ public class ListeningRecord {
     private String songName;
     private String songArtist;
     private String songCoverArt; // url
-    private LocalDateTime playedAt;
+    private Instant playedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
