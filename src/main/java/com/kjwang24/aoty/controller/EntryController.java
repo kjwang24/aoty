@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -24,15 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/entries")
+@RequiredArgsConstructor
 public class EntryController {
 
     private final EntryService entryService;
     private final UserRepository userRepository;
-    
-    public EntryController(EntryService entryService, UserRepository userRepository) {
-        this.entryService = entryService;
-        this.userRepository = userRepository;
-    }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
@@ -43,7 +41,7 @@ public class EntryController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public void createEntry(@AuthenticationPrincipal OAuth2User principal, @RequestBody EntryRequest request) {
+    public void createEntry(@AuthenticationPrincipal OAuth2User principal, @RequestBody EntryPostRequest request) {
         User user = resolveUser(principal);
         entryService.createEntry(user, request.date(), request.spotifyId(), Optional.ofNullable(request.note()));
     }
@@ -51,7 +49,7 @@ public class EntryController {
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/{date}")
     public Entry updateEntry(@AuthenticationPrincipal OAuth2User principal, @PathVariable LocalDate date,
-            @RequestBody EntryUpdateRequest request) {
+            @RequestBody EntryPatchRequest request) {
         User user = resolveUser(principal);
         return entryService.updateEntry(user, date, Optional.ofNullable(request.spotifyId()), Optional.ofNullable(request.note()));
     }
@@ -61,13 +59,13 @@ public class EntryController {
         return userRepository.findByAccountId(accountId).orElseThrow(() -> new IllegalStateException("no user found for that account id " + accountId));
     }
 
-    private record EntryRequest(
+    private record EntryPostRequest(
             @JsonProperty("date") LocalDate date,
             @JsonProperty("spotify_id") String spotifyId,
             @JsonProperty("note") String note) {
     }
 
-    private record EntryUpdateRequest(
+    private record EntryPatchRequest(
             @JsonProperty("spotify_id") String spotifyId,
             @JsonProperty("note") String note) {
     }

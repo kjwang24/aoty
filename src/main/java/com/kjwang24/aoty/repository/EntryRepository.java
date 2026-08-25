@@ -14,4 +14,8 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
     Optional<Entry> findByUserAndDate(User user, LocalDate date);
 
     List<Entry> findByUserOrderByDateAsc(User user);
+
+    long countByUserAndDateLessThan(User user, LocalDate date);
+
+    boolean existsByUserAndSpotifyId(User user, String spotifyId);
 }

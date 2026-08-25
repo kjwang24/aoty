@@ -11,7 +11,7 @@ import tools.jackson.databind.JsonNode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Component
-public class SpotifyRecentlyPlayedClient {
+public class ScraperClient {
 
     private final RestClient restClient = RestClient.create();
 

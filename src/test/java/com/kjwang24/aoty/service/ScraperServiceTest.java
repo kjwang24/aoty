@@ -24,9 +24,8 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import com.kjwang24.aoty.entity.User;
 import com.kjwang24.aoty.repository.ListeningRecordRepository;
 import com.kjwang24.aoty.repository.UserRepository;
-import com.kjwang24.aoty.service.EntryExceptions.DuplicateEntryException;
-import com.kjwang24.aoty.service.SpotifyRecentlyPlayedClient.RecentlyPlayedItem;
-import com.kjwang24.aoty.service.SpotifyRecentlyPlayedClient.Track;
+import com.kjwang24.aoty.service.ScraperClient.RecentlyPlayedItem;
+import com.kjwang24.aoty.service.ScraperClient.Track;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(OutputCaptureExtension.class)
@@ -42,7 +41,7 @@ public class ScraperServiceTest {
     private TokenRefreshService tokenRefreshService;
 
     @Mock
-    private SpotifyRecentlyPlayedClient spotifyRecentlyPlayedClient;
+    private ScraperClient spotifyRecentlyPlayedClient;
 
     @InjectMocks
     private ScraperService scraperService;
@@ -119,8 +118,7 @@ public class ScraperServiceTest {
 
         scraperService.scrape();
 
-        assertThat(output.getOut())
-                .contains("warning");
+        assertThat(output.getOut()).contains("warning");
         verify(listeningRecordRepository).save(argThat(record ->
             record.getUser().equals(validUser)
                 && record.getSpotifyId().equals("sober")

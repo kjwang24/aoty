@@ -2,6 +2,7 @@ package com.kjwang24.aoty.service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import com.kjwang24.aoty.entity.ListeningRecord;
 import com.kjwang24.aoty.entity.User;
 import com.kjwang24.aoty.repository.ListeningRecordRepository;
 import com.kjwang24.aoty.repository.UserRepository;
-import com.kjwang24.aoty.service.SpotifyRecentlyPlayedClient.RecentlyPlayedItem;
+import com.kjwang24.aoty.service.ScraperClient.RecentlyPlayedItem;
 
 @Slf4j
 @Service
@@ -23,9 +24,9 @@ public class ScraperService {
     private final UserRepository userRepository;
     private final ListeningRecordRepository listeningRecordRepository;
     private final TokenRefreshService tokenRefreshService;
-    private final SpotifyRecentlyPlayedClient spotifyRecentlyPlayedClient;
+    private final ScraperClient spotifyRecentlyPlayedClient;
 
-    @Scheduled(cron = "0 0 0,12,18 * * *") // cuz are we really gonna listen to 50+ songs between midnight and noon
+    @Scheduled(fixedRate = 6, timeUnit = TimeUnit.HOURS)
     public void scrape() {
         for (User user : userRepository.findAll()) {
             try {

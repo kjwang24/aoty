@@ -3,6 +3,7 @@ package com.kjwang24.aoty.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -26,6 +27,9 @@ public class EntryServiceTest {
     @Mock
     private EntryRepository entryRepository;
 
+    @Mock
+    private PlaylistService playlistService;
+
     @InjectMocks
     private EntryService entryService;
 
@@ -43,6 +47,7 @@ public class EntryServiceTest {
         assertThat(result.getUser()).isEqualTo(user);
         assertThat(result.getDate()).isEqualTo(date);
         assertThat(result.getSpotifyId()).isEqualTo("slug");
+        verify(playlistService).syncEntry(user, result, Optional.empty());
     }
 
     @Test
@@ -104,6 +109,7 @@ public class EntryServiceTest {
 
         assertThat(updated.getSpotifyId()).isEqualTo("mori no chiisana restaurant");
         assertThat(updated.getNote()).isEqualTo("smol");
+        verify(playlistService).syncEntry(user, updated, Optional.of("always with me"));
     }
 
 }

@@ -21,7 +21,10 @@ import lombok.NoArgsConstructor;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Table(name = "entries", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "date"}))
+@Table(name = "entries", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "date"}),
+    @UniqueConstraint(columnNames = {"user_id", "spotifyId"})
+})
 public class Entry {
 
     @Id
