@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,9 +16,11 @@ import tools.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
@@ -123,5 +126,45 @@ public class ScraperServiceTest {
             record.getUser().equals(validUser)
                 && record.getSpotifyId().equals("sober")
                 && record.getPlayedAt().equals(instant)));
+    }
+
+    @Test
+    void scrape_prunesPlaysOlderThanTheOldestOneASuggestionCouldReach() {
+        User user = new User();
+        user.setAccountId("kjwang24");
+        Instant cutoff = Instant.parse("2026-01-01T00:00:00Z");
+
+        when(userRepository.findAll()).thenReturn(List.of(user));
+        when(tokenRefreshService.getValidAccessToken(user)).thenReturn("access");
+        when(spotifyRecentlyPlayedClient.fetchRecentlyPlayed("access")).thenReturn(List.of());
+        when(listeningRecordRepository.findPlayedAtDescending(eq(user), any(Pageable.class)))
+            .thenReturn(List.of(cutoff));
+
+        scraperService.scrape();
+
+        // The window has to land on the 250th play, not the 249th or the 251st, or the history
+        // creeps a row longer or shorter than what SuggestionService can actually reach.
+        ArgumentCaptor<Pageable> pageable = ArgumentCaptor.forClass(Pageable.class);
+        verify(listeningRecordRepository).findPlayedAtDescending(eq(user), pageable.capture());
+        assertThat(pageable.getValue().getOffset()).isEqualTo(SuggestionService.MAX_USEFUL_HISTORY - 1);
+        assertThat(pageable.getValue().getPageSize()).isEqualTo(1);
+
+        verify(listeningRecordRepository).deleteByUserOlderThan(user, cutoff);
+    }
+
+    @Test
+    void scrape_prunesNothing_forAUserStillUnderTheCap() {
+        User user = new User();
+        user.setAccountId("kjwang24");
+
+        when(userRepository.findAll()).thenReturn(List.of(user));
+        when(tokenRefreshService.getValidAccessToken(user)).thenReturn("access");
+        when(spotifyRecentlyPlayedClient.fetchRecentlyPlayed("access")).thenReturn(List.of());
+        when(listeningRecordRepository.findPlayedAtDescending(eq(user), any(Pageable.class)))
+            .thenReturn(List.of());
+
+        scraperService.scrape();
+
+        verify(listeningRecordRepository, never()).deleteByUserOlderThan(any(), any());
     }
 }

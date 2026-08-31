@@ -1,0 +1,917 @@
+:root {
+  /* Kept in sync with #root's width in index.css and .app-shell's horizontal padding
+     below — the season-art bands are positioned off these to sit flush against the
+     calendar's outer edges. */
+  --shell-width: 900px;
+  --shell-pad-x: 20px;
+  --shell-pad-top: 14px;
+  --shell-pad-bottom: 12px;
+  --art-band: 175px;
+  /* Page left between the widest piece (143px) and the calendar at full band width, and
+     the breathing room kept when a narrow screen squeezes the band. */
+  --art-gap: 32px;
+
+  /* Distance from the screen edge to the calendar's outer edge: half the page width left
+     over beside the card, plus the card's own padding. */
+  --calendar-edge: max(
+    var(--shell-pad-x),
+    calc((100vw - var(--shell-width)) / 2 + var(--shell-pad-x))
+  );
+  /* The band wants its full width but can never outgrow the margin it lives in, so on a
+     narrower screen it shrinks and takes the art with it instead of sliding off-screen. */
+  --art-band-width: min(var(--art-band), var(--calendar-edge));
+}
+
+.app-shell {
+  height: 100%;
+  box-sizing: border-box;
+  padding: var(--shell-pad-top) var(--shell-pad-x) var(--shell-pad-bottom);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-height: 0;
+}
+
+/* Seasonal art in the page margins, outside the card */
+
+.season-art {
+  position: fixed;
+  width: var(--art-band-width);
+  display: flex;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.season-art img {
+  /* Native resolution — the widest of the eight is 143px, so every one already fits inside
+     the band without upscaling. The max-width only bites on a screen too narrow to hold a
+     full band, where it shrinks the art to keep it off the calendar. */
+  max-width: max(0px, calc(var(--art-band-width) - var(--art-gap)));
+  height: auto;
+}
+
+/* Inner edge of the band sits flush against the calendar's outer edge; vertically the art
+   lines up with the card — top of the header on the left, bottom of the card on the right. */
+.season-art-left {
+  top: var(--shell-pad-top);
+  left: calc(var(--calendar-edge) - var(--art-band-width));
+  justify-content: flex-start;
+}
+
+.season-art-right {
+  bottom: var(--shell-pad-bottom);
+  right: calc(var(--calendar-edge) - var(--art-band-width));
+  justify-content: flex-end;
+}
+
+/* Header */
+
+/* Two lines at 46px and 21px can't share one line-height: the gothic caps need it tight and
+   the italic needs room for its descenders, so each sets its own and a gap separates them. */
+.app-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: none;
+}
+
+.header-name {
+  font-family: var(--font-gothic);
+  font-size: 46px;
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--text);
+  letter-spacing: 0.005em;
+}
+
+.header-subtitle {
+  font-family: var(--font-book);
+  font-size: 21px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--accent-strong);
+}
+
+/* Login screen */
+
+.status-message {
+  text-align: center;
+  margin-top: 120px;
+  color: var(--text-dim);
+  font-family: var(--font-book);
+  font-style: italic;
+}
+
+.login-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-lg);
+  min-height: 100svh;
+}
+
+/* Set in the button's own face and size, so the title and the control read as one plate. */
+.login-title {
+  font-family: var(--font-caps);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  margin: 0;
+}
+
+.login-link {
+  font-family: var(--font-caps);
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  padding: 14px 34px;
+  border-radius: 2px;
+  border: 2px solid var(--lead);
+  background: var(--accent);
+  color: var(--lead);
+  text-decoration: none;
+  box-shadow: var(--shadow), inset 0 0 0 1px var(--lead-highlight),
+    0 0 32px -4px var(--glow-ambient);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.login-link:hover {
+  box-shadow: var(--shadow), inset 0 0 0 1px var(--lead-highlight),
+    0 0 48px -2px var(--glow-ambient);
+  transform: translateY(-1px);
+}
+
+/* Inset window + tabs */
+
+.inset {
+  border: 2px solid var(--came);
+  border-radius: 3px;
+  box-shadow: var(--shadow), inset 0 0 0 1px var(--lead-highlight);
+  overflow: hidden;
+  background: var(--bg-elevated);
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs {
+  display: flex;
+  background: var(--bg);
+  border-bottom: 2px solid var(--came);
+  flex: none;
+}
+
+.tab {
+  flex: 1;
+  border: none;
+  background: none;
+  /* Small caps come from the face itself, so the label keeps its real capital and the rest
+     drops to caps height — text-transform would flatten that back to one size. */
+  font-family: var(--font-caps);
+  font-size: 15px;
+  letter-spacing: 0.09em;
+  padding: 10px var(--space-md) 9px;
+  cursor: pointer;
+  color: var(--text-dim);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.tab:hover {
+  color: var(--accent-strong);
+}
+
+.tab.active {
+  color: var(--accent-strong);
+  border-bottom-color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+.tab-content {
+  padding: var(--space-md);
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Calendar */
+
+.calendar {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  /* Less than the 14px above it (tab-content's padding), so the month reads as belonging to
+     the grid below rather than floating between the two. */
+  margin-bottom: 10px;
+  flex: none;
+}
+
+.calendar-header h2 {
+  font-family: var(--font-gothic);
+  font-size: 26px;
+  font-weight: 500;
+  /* 1.5 from the root would give the heading more internal leading than the space around it. */
+  line-height: 1.15;
+  /* Wide enough for "September" so the arrows don't shift as the month changes. */
+  min-width: 170px;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+/* Bare arrows — no frame. Padding keeps the hit target at 26px even though nothing is drawn
+   around the glyph. */
+.calendar-nav {
+  border: none;
+  background: none;
+  padding: 5px;
+  color: var(--accent-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.calendar-nav svg {
+  width: 16px;
+  height: 16px;
+}
+
+.calendar-nav:hover {
+  color: var(--accent);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: auto repeat(6, 1fr);
+  /* Oxidized lead came holding the panes, not limestone grout between tiles. */
+  gap: 4px;
+  background: var(--came);
+  padding: 4px;
+  border-radius: 2px;
+  flex: 1;
+  min-height: 0;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-family: var(--font-caps);
+  font-size: 14px;
+  /* Plaster on the came, 6.1:1 — limestone would only reach 3.7:1 on the lighter brown. */
+  color: var(--bg);
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  /* Air on both sides of the lettering, or it sits jammed against the came's top edge. */
+  padding: 6px 0 var(--space-sm);
+}
+
+.calendar-day {
+  border: none;
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px var(--lead-highlight);
+  font-family: var(--font-book);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  transition: box-shadow 0.2s;
+  /* The glass multiplies against the pane's own tint. Without this the pane is not a
+     stacking context, and the blend would reach past it to whatever is behind the grid. */
+  isolation: isolate;
+}
+
+/* Blank panes, not holes. Letting the came show through here reads as a missing corner of
+   the window whenever a month starts late in the week — flat frost keeps the panel whole,
+   and stays distinct from a locked day, which is hatched rather than flat. */
+.calendar-day.pane-void {
+  background: var(--frost);
+  box-shadow: none;
+  cursor: default;
+}
+
+
+.calendar-day:disabled {
+  cursor: default;
+}
+
+.day-number {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  font-family: var(--font-book);
+  font-size: 13px;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(2px);
+  border-radius: 1px;
+  padding: 1px var(--space-xs);
+  line-height: 1.2;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cell-glass {
+  position: absolute;
+  inset: -25%;
+  background-image: var(--art);
+  background-size: cover;
+  background-position: var(--art-pos, 50% 50%);
+  transform: rotate(var(--art-rot, 0deg)) scale(var(--art-scale, 1.6));
+  /* grayscale strips the art's own hue entirely, and multiplying the result over the pane's
+     season tint puts it back in exactly one colour. contrast+brightness compress the art into
+     roughly the top two thirds of the range first, so the tint stays the thing you read and
+     the cover only modulates it — a dark album cover shades the pane instead of blackening it. */
+  filter: grayscale(1) contrast(0.5) brightness(1.35) blur(3px);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.cell-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 40%);
+  pointer-events: none;
+}
+
+.cell-roundel {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* filled panes: the season's flat tint, modulated by the art multiplied over it, glowing at
+   the edges. The tints are pale enough to vanish as a halo against the limestone, so the glow
+   is the same colour taken a third of the way to black. */
+.pane-filled {
+  background: var(--season-tint);
+  box-shadow:
+    inset 0 0 0 1px var(--lead-highlight),
+    0 0 10px -3px color-mix(in oklab, var(--season-tint) 68%, #000);
+}
+
+.pane-filled:hover {
+  box-shadow:
+    inset 0 0 0 1px var(--lead-highlight),
+    0 0 14px -2px color-mix(in oklab, var(--season-tint) 58%, #000);
+}
+
+/* fillable panes: clear glass, waiting */
+.pane-fillable {
+  /* TEMP preview: radial "clear glass" gradient removed per request, easy to restore:
+     background: radial-gradient(circle at 50% 35%, #fffdf8 0%, var(--bg-elevated) 75%); */
+  background: var(--bg-elevated);
+  align-items: center;
+  justify-content: center;
+}
+
+.pane-fillable.pane-today {
+  box-shadow:
+    inset 0 0 0 1px var(--lead-highlight),
+    0 0 14px -3px var(--glow-ambient);
+}
+
+.pane-plus {
+  width: 16px;
+  height: 16px;
+  color: var(--text-faint);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Each empty pane lights up in its own stone rather than the shared amber — the day's
+   colour is assigned in Calendar.tsx and arrives as --plus-jewel. */
+.pane-fillable:hover .pane-plus {
+  color: var(--plus-jewel, var(--accent));
+  opacity: 1;
+}
+
+/* locked panes: unglazed lead, nothing to see yet */
+.pane-locked {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--frost) 0px,
+    var(--frost) 6px,
+    var(--stone-border) 6px,
+    var(--stone-border) 12px
+  );
+  cursor: default;
+}
+
+/* A locked day still has to be readable as a date — the hatch is what says "inert", not an
+   illegible numeral. The old dark wash put frosted-pane-text at 1.5:1, so this switches to
+   the system's frosted chip with umber-dim on top (4.9:1). */
+.pane-locked .day-number {
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+/* Cover art roundels */
+
+.cover-art {
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--came);
+  border: 3px solid var(--came);
+  box-shadow: 0 0 16px -2px var(--glow-ambient), inset 0 0 0 1px var(--lead-highlight);
+}
+
+.cover-art.small {
+  width: 40px;
+  height: 40px;
+  border-width: 2px;
+}
+
+.cover-art.cell {
+  width: 56px;
+  height: 56px;
+  border-width: 1px;
+}
+
+.cover-art.large {
+  width: 128px;
+  height: 128px;
+  margin: 0 auto var(--space-lg);
+  display: block;
+  border-width: 2px;
+}
+
+/* Modal */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 20px;
+}
+
+.modal {
+  background: var(--bg-elevated);
+  border: 3px solid var(--lead);
+  border-radius: 3px;
+  padding: 22px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 85svh;
+  overflow-y: auto;
+  box-shadow: var(--shadow), inset 0 0 0 1px var(--lead-highlight), 0 0 60px -20px var(--glow-ambient);
+  position: relative;
+  text-align: center;
+}
+
+/* The modal takes focus on open so focus lands inside the dialog rather than on the search
+   field. It's a container, not a control, so it doesn't wear the global amber focus ring —
+   that ring belongs to things you can act on. */
+.modal:focus,
+.modal:focus-visible {
+  outline: none;
+}
+
+/* Picking a song is the one state holding three things side by side; every other state is a
+   single column and would only look thin at this width. Widening here rather than everywhere
+   is what lets the three titles breathe instead of clamping. */
+.modal.picking {
+  max-width: 500px;
+}
+
+.modal-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  gap: var(--space-sm);
+}
+
+.modal-close {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-dim);
+  display: flex;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.modal-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.modal-close:hover {
+  color: var(--accent);
+}
+
+.modal-edit {
+  border: 2px solid var(--stone-border);
+  background: var(--bg-elevated);
+  color: var(--accent-strong);
+  border-radius: 2px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex: none;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.modal-edit svg {
+  width: 15px;
+  height: 15px;
+}
+
+.modal-edit:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px -2px var(--glow-ambient);
+}
+
+.modal-date {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-caps);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.modal-save {
+  border: 2px solid var(--lead);
+  background: var(--accent);
+  color: var(--lead);
+  font-family: var(--font-caps);
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  padding: 7px 18px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.modal-save:hover:not(:disabled) {
+  box-shadow: 0 0 16px -2px var(--glow-ambient);
+}
+
+.modal-save:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.modal-error {
+  /* Iron-oxide red rather than a UI alert red — warm enough to belong on plaster. */
+  color: #8f2f22;
+  font-size: 15px;
+  margin: 0 0 14px;
+}
+
+/* Title and artist are one unit (4px apart); the note is a separate thought (22px away). */
+.modal-body .song-name {
+  font-family: var(--font-book);
+  color: var(--text);
+  font-size: 22px;
+  line-height: 1.25;
+  margin-bottom: var(--space-xs);
+}
+
+.modal-body .song-artist {
+  font-family: var(--font-caps);
+  color: var(--text-dim);
+  font-size: 15px;
+  letter-spacing: 0.05em;
+}
+
+.modal-body .note {
+  font-family: var(--font-book);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--text-dim);
+  margin-top: var(--space-lg);
+  line-height: 1.55;
+}
+
+.change-song {
+  border: 2px solid var(--stone-border);
+  background: none;
+  color: var(--text);
+  font-family: var(--font-caps);
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  padding: 7px 18px;
+  border-radius: 2px;
+  cursor: pointer;
+  margin-top: var(--space-lg);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.change-song:hover {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+/* Suggestions — three songs pulled from the user's listening, offered before the search box */
+
+.suggestions {
+  margin-bottom: var(--space-lg);
+}
+
+/* Deliberately the search input's placeholder treatment, not a section header — the two are
+   one offer read top to bottom ("pick from your history… or search"), so they speak in the
+   same voice. Keep in sync with .search-input / .search-input::placeholder. */
+.suggestions-label {
+  font-family: var(--font-book);
+  font-size: 17px;
+  font-style: italic;
+  color: var(--text-faint);
+  margin: 0 0 var(--space-md);
+}
+
+/* minmax(0, 1fr) rather than 1fr: a grid column's automatic minimum is its content, so a long
+   unbroken title would otherwise push its own column wider than a third of the row. */
+.suggestion-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+/* No frame at rest: three roundels reading as a row of options, not as three widgets. The
+   border is transparent rather than absent so nothing shifts when it arrives on hover. */
+.suggestion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+  /* Barely any side padding: the row's gutter is what separates the three, so spending width
+     on internal padding only squeezes the titles into more line breaks. */
+  padding: var(--space-md) var(--space-xs);
+  border: 2px solid transparent;
+  border-radius: 2px;
+  background: none;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+/* The modal is already --bg-elevated, so the card lifts by going one step *down* into the
+   limestone rather than up. Keyboard focus draws the same card as hover, not just an outline. */
+.suggestion:hover,
+.suggestion:focus-visible {
+  border-color: var(--came);
+  background: var(--bg);
+}
+
+.cover-art.suggestion-art {
+  width: 64px;
+  height: 64px;
+  border-width: 2px;
+  margin-bottom: var(--space-xs);
+}
+
+/* Titles run long. Two lines then clip, so one wordy song can't set the height of the row —
+   and always two lines' worth of space, so a one-line title next to a two-line one doesn't
+   leave the three artist names sitting at three different heights. */
+.suggestion .song-name {
+  font-family: var(--font-book);
+  font-size: 15px;
+  line-height: 1.3;
+  min-height: 2.6em;
+  /* .modal-body .song-name carries a bottom margin for the big single-song layout; here the
+     column gap already does the spacing. */
+  margin: 0;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.suggestion .song-artist {
+  font-family: var(--font-caps);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  text-align: center;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Search */
+
+.search-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-book);
+  font-size: 17px;
+  padding: 10px 14px;
+  border-radius: 2px;
+  border: 2px solid var(--stone-border);
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.search-input::placeholder {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.search-input:focus-visible {
+  border-color: var(--accent);
+}
+
+.search-status {
+  font-family: var(--font-book);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-faint);
+  margin: 8px 0 0;
+}
+
+.search-results {
+  list-style: none;
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  /* Each row is a 40px roundel beside two lines of type — 4px between them ran the rows
+     together into one block. */
+  gap: var(--space-sm);
+  max-height: 260px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.search-results button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  border: none;
+  background: none;
+  font: inherit;
+  padding: var(--space-sm) 10px;
+  border-radius: 2px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+}
+
+.search-results button:hover {
+  background: rgba(224, 165, 66, 0.1);
+}
+
+.result-text {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.result-text .song-name {
+  font-family: var(--font-book);
+  font-size: 17px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.result-text .song-artist {
+  font-family: var(--font-caps);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-book);
+  font-style: italic;
+  font-size: 17px;
+  padding: var(--space-md);
+  border-radius: 2px;
+  border: 2px solid var(--stone-border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  min-height: 80px;
+  margin-top: var(--space-md);
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.note-input::placeholder {
+  color: var(--text-faint);
+}
+
+.note-input:focus-visible {
+  border-color: var(--accent);
+}
+
+/* Confirm dialog */
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  padding: 20px;
+}
+
+.confirm-box {
+  background: var(--bg-elevated);
+  border: 3px solid var(--lead);
+  border-radius: 3px;
+  padding: 20px;
+  max-width: 340px;
+  box-shadow: var(--shadow);
+}
+
+.confirm-box p {
+  font-family: var(--font-book);
+  font-size: 17px;
+  color: var(--text);
+  margin: 0 0 var(--space-lg);
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+}
+
+.confirm-actions button {
+  font-family: var(--font-caps);
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  padding: 7px 18px;
+  border-radius: 2px;
+  cursor: pointer;
+  border: 2px solid var(--stone-border);
+  background: none;
+  color: var(--text);
+}
+
+.confirm-actions button:first-child {
+  background: var(--accent);
+  border-color: var(--lead);
+  color: var(--lead);
+}
+
+/* Playlist */
+
+.playlist-status {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 60px 0;
+  font-family: var(--font-book);
+  font-style: italic;
+  font-size: 17px;
+}
+
+.playlist-embed {
+  border: none;
+  border-radius: 2px;
+  display: block;
+}

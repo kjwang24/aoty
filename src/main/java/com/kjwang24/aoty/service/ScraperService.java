@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -39,11 +40,33 @@ public class ScraperService {
                         listeningRecordRepository.save(toListeningRecord(item, user));
                     }
                 }
+
+                prune(user);
             }
             catch (Exception e) {
                 log.warn("warning: scrape at {} utc failed for user with db id {}: {}", Instant.now(), user.getId(), e.getMessage());
             }
         }
+    }
+
+    /**
+     * Drops everything older than the oldest play a suggestion could ever be drawn from. The
+     * history exists to feed {@link SuggestionService}, which never reaches further back than
+     * {@link SuggestionService#MAX_USEFUL_HISTORY} plays, so rows past that are dead weight
+     * that would otherwise grow without limit for the life of the account.
+     */
+    private void prune(User user) {
+        List<Instant> cutoff = listeningRecordRepository.findPlayedAtDescending(user,
+            PageRequest.of(SuggestionService.MAX_USEFUL_HISTORY - 1, 1));
+
+        // Fewer plays on record than the cap, so there is nothing past it yet.
+        if (cutoff.isEmpty()) {
+            return;
+        }
+
+        // Strictly older, so plays sharing the cutoff's exact timestamp all survive together
+        // rather than being split by which side of the limit they happened to land on.
+        listeningRecordRepository.deleteByUserOlderThan(user, cutoff.get(0));
     }
 
     private ListeningRecord toListeningRecord(RecentlyPlayedItem item, User user) {

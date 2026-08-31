@@ -21,46 +21,62 @@ public class EntryService {
     private final EntryRepository entryRepository;
     private final PlaylistService playlistService;
 
-    public Entry createEntry(User user, LocalDate date, String spotifyId, Optional<String> note) {
+    public Entry createEntry(User user, LocalDate date, SongSelection song, Optional<String> note) {
         if (date.isAfter(LocalDate.now())) {
             throw new ForbiddenUpdateException("cannot create entries for future days");
         }
         if (entryRepository.findByUserAndDate(user, date).isPresent()) {
             throw new DuplicateEntryException("an entry already exists for user " + user.getId() + " on " + date);
         }
-        if (entryRepository.existsByUserAndSpotifyId(user, spotifyId)) {
-            throw new DuplicateEntryException("song " + spotifyId + " has already been used by user " + user.getId());
+        if (entryRepository.existsByUserAndSpotifyId(user, song.spotifyId())) {
+            throw new DuplicateEntryException("song " + song.spotifyId() + " has already been used by user " + user.getId());
         }
         Entry entry = new Entry();
         entry.setUser(user);
         entry.setDate(date);
-        entry.setSpotifyId(spotifyId);
+        applySong(entry, song);
         note.ifPresent(entry::setNote);
         entryRepository.save(entry);
         playlistService.syncEntry(user, entry, Optional.empty());
         return entry;
     }
 
-    public Entry updateEntry(User user, LocalDate date, Optional<String> spotifyId, Optional<String> note) {
+    public Entry updateEntry(User user, LocalDate date, Optional<SongSelection> song, Optional<String> note) {
         if (!date.isEqual(LocalDate.now())) {
             throw new ForbiddenUpdateException("cannot edit the entries of days other than today");
         }
         Entry entry = entryRepository.findByUserAndDate(user, date)
                       .orElseThrow(() -> new ForbiddenUpdateException("no entry exists yet for user " + user.getId() + " today"));
         String existingSpotifyId = entry.getSpotifyId();
-        boolean songChanged = spotifyId.isPresent() && !spotifyId.get().equals(existingSpotifyId);
-        if (songChanged && entryRepository.existsByUserAndSpotifyId(user, spotifyId.get())) {
-            throw new DuplicateEntryException("song " + spotifyId.get() + " has already been used by user " + user.getId());
+        boolean songChanged = song.isPresent() && !song.get().spotifyId().equals(existingSpotifyId);
+        if (songChanged && entryRepository.existsByUserAndSpotifyId(user, song.get().spotifyId())) {
+            throw new DuplicateEntryException("song " + song.get().spotifyId() + " has already been used by user " + user.getId());
         }
-        spotifyId.ifPresent(entry::setSpotifyId);
+        song.ifPresent(s -> applySong(entry, s));
         note.ifPresent(entry::setNote);
         entryRepository.save(entry);
-        playlistService.syncEntry(user, entry, songChanged ? Optional.of(existingSpotifyId) : Optional.empty());
+        if (songChanged) {
+            playlistService.syncEntry(user, entry, Optional.of(existingSpotifyId));
+        }
         return entry;
     }
 
     public List<Entry> getAllEntries(User user) {
         return entryRepository.findByUserOrderByDateAsc(user);
     }
+
+    private void applySong(Entry entry, SongSelection song) {
+        entry.setSpotifyId(song.spotifyId());
+        entry.setSongName(song.songName());
+        entry.setSongArtist(song.songArtist());
+        entry.setSongCoverArt(song.songCoverArt());
+    }
+
+    public record SongSelection(
+        String spotifyId,
+        String songName,
+        String songArtist,
+        String songCoverArt
+    ) {}
 
 }

@@ -27,6 +27,7 @@ import com.kjwang24.aoty.repository.UserRepository;
 import com.kjwang24.aoty.service.EntryExceptions.DuplicateEntryException;
 import com.kjwang24.aoty.service.EntryExceptions.ForbiddenUpdateException;
 import com.kjwang24.aoty.service.EntryService;
+import com.kjwang24.aoty.service.EntryService.SongSelection;
 
 @WebMvcTest(EntryController.class)
 public class EntryControllerTest {
@@ -76,26 +77,28 @@ public class EntryControllerTest {
                .with(oauth2Login().attributes(attrs -> attrs.put("account_id", "kjwang24")))
                .with(csrf())
                .contentType(MediaType.APPLICATION_JSON)
-               .content("{\"date\":\"2026-08-01\",\"spotify_id\":\"good days\"}"))
+               .content("{\"date\":\"2026-08-01\",\"spotify_id\":\"good days\",\"song_name\":\"Good Days\",\"song_artist\":\"SZA\",\"song_cover_art\":\"http://cover\"}"))
                .andExpect(status().isCreated());
 
-        verify(entryService).createEntry(user, LocalDate.of(2026, 8, 1), "good days", Optional.empty());
+        verify(entryService).createEntry(user, LocalDate.of(2026, 8, 1),
+                new SongSelection("good days", "Good Days", "SZA", "http://cover"), Optional.empty());
     }
 
     @Test
     void postDuplicateEntry_throws409() throws Exception {
         User user = new User();
         user.setAccountId("kjwang24");
+        SongSelection song = new SongSelection("didn't cha know", "Didn't Cha Know", "Erykah Badu", "http://cover");
 
         when(userRepository.findByAccountId("kjwang24")).thenReturn(java.util.Optional.of(user));
-        when(entryService.createEntry(user, LocalDate.of(2026, 8, 1), "didn't cha know", Optional.empty()))
+        when(entryService.createEntry(user, LocalDate.of(2026, 8, 1), song, Optional.empty()))
                 .thenThrow(new DuplicateEntryException(""));
 
         mockMvc.perform(post("/entries")
                .with(oauth2Login().attributes(attrs -> attrs.put("account_id", "kjwang24")))
                .with(csrf())
                .contentType(MediaType.APPLICATION_JSON)
-               .content("{\"date\":\"2026-08-01\", \"spotify_id\":\"didn't cha know\"}"))
+               .content("{\"date\":\"2026-08-01\", \"spotify_id\":\"didn't cha know\",\"song_name\":\"Didn't Cha Know\",\"song_artist\":\"Erykah Badu\",\"song_cover_art\":\"http://cover\"}"))
                .andExpect(status().isConflict());
     }
 
@@ -110,17 +113,19 @@ public class EntryControllerTest {
         entry.setDate(date);
         entry.setSpotifyId("planes");
 
+        SongSelection song = new SongSelection("planes", "Planes", "Jeremy Zucker", "http://cover");
+
         when(userRepository.findByAccountId("kjwang24")).thenReturn(java.util.Optional.of(user));
-        when(entryService.updateEntry(user, date, Optional.of("planes"), Optional.empty())).thenReturn(entry);
+        when(entryService.updateEntry(user, date, Optional.of(song), Optional.empty())).thenReturn(entry);
 
         mockMvc.perform(patch("/entries/{date}", date)
                .with(oauth2Login().attributes(attrs -> attrs.put("account_id", "kjwang24")))
                .with(csrf())
                .contentType(MediaType.APPLICATION_JSON)
-               .content(String.format("{\"spotify_id\":\"planes\"}")))
+               .content("{\"spotify_id\":\"planes\",\"song_name\":\"Planes\",\"song_artist\":\"Jeremy Zucker\",\"song_cover_art\":\"http://cover\"}"))
                .andExpect(status().isOk());
 
-        verify(entryService).updateEntry(user, date, Optional.of("planes"), Optional.empty());
+        verify(entryService).updateEntry(user, date, Optional.of(song), Optional.empty());
     }
 
     @Test
@@ -128,16 +133,17 @@ public class EntryControllerTest {
         User user = new User();
         user.setAccountId("kjwang24");
         LocalDate date = LocalDate.of(2026, 8, 1);
+        SongSelection song = new SongSelection("400 lux", "400 Lux", "Lorde", "http://cover");
 
         when(userRepository.findByAccountId("kjwang24")).thenReturn(java.util.Optional.of(user));
-        when(entryService.updateEntry(user, date, Optional.of("400 lux"), Optional.empty()))
+        when(entryService.updateEntry(user, date, Optional.of(song), Optional.empty()))
                 .thenThrow(new ForbiddenUpdateException(""));
 
         mockMvc.perform(patch("/entries/{date}", date)
                .with(oauth2Login().attributes(attrs -> attrs.put("account_id", "kjwang24")))
                .with(csrf())
                .contentType(MediaType.APPLICATION_JSON)
-               .content("{\"spotify_id\":\"400 lux\"}"))
+               .content("{\"spotify_id\":\"400 lux\",\"song_name\":\"400 Lux\",\"song_artist\":\"Lorde\",\"song_cover_art\":\"http://cover\"}"))
                .andExpect(status().isForbidden());
     }
 

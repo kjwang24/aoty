@@ -17,13 +17,15 @@ public class SpotifyAuthService {
     private final UserRepository userRepository;
     private final SpotifyCredentialRepository spotifyCredentialRepository;
 
-    public void handleLogin(String accountId, String displayName, String accessToken, String refreshToken, Instant expiresAt) {
+    public void handleLogin(String accountId, String displayName, String pfpUrl, String accessToken, String refreshToken, Instant expiresAt) {
         User user = userRepository.findByAccountId(accountId).orElseGet(() -> {
             User newUser = new User();
             newUser.setAccountId(accountId);
             newUser.setDisplayName(displayName);
             return userRepository.save(newUser);
         });
+        user.setPfpUrl(pfpUrl);
+        userRepository.save(user);
 
         SpotifyCredential cred = spotifyCredentialRepository.findByUser(user).orElseGet(() -> {
             SpotifyCredential newCred = new SpotifyCredential();

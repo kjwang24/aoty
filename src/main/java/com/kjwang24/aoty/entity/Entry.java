@@ -11,6 +11,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,5 +44,6 @@ public class Entry {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id") // no need for referencedColumnName since users table has @Id
+    @JsonIgnore
     private User user;
 }

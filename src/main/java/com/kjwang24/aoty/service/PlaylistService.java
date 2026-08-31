@@ -10,7 +10,9 @@ import com.kjwang24.aoty.repository.EntryRepository;
 import com.kjwang24.aoty.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PlaylistService {
@@ -26,8 +28,15 @@ public class PlaylistService {
             String playlistId = playlistClient.createPlaylist(accessToken);
             user.setSpotifyPlaylistId(playlistId);
             userRepository.save(user);
+            if (user.getPfpUrl() != null) {
+                try {
+                    playlistClient.setCoverImage(accessToken, playlistId, user.getPfpUrl());
+                } catch (Exception e) {
+                    log.warn("failed to set playlist cover image for user {}: {}", user.getId(), e.getMessage());
+                }
+            }
         }
-        
+
         existingSpotifyId.ifPresent(spotifyId ->
             playlistClient.deleteTrack(accessToken, user.getSpotifyPlaylistId(), "spotify:track:" + spotifyId));
         

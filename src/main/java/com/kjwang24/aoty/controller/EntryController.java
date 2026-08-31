@@ -5,6 +5,7 @@ import com.kjwang24.aoty.entity.User;
 import com.kjwang24.aoty.entity.Entry;
 import com.kjwang24.aoty.repository.UserRepository;
 import com.kjwang24.aoty.service.EntryService;
+import com.kjwang24.aoty.service.EntryService.SongSelection;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -43,7 +44,8 @@ public class EntryController {
     @PostMapping
     public void createEntry(@AuthenticationPrincipal OAuth2User principal, @RequestBody EntryPostRequest request) {
         User user = resolveUser(principal);
-        entryService.createEntry(user, request.date(), request.spotifyId(), Optional.ofNullable(request.note()));
+        SongSelection song = new SongSelection(request.spotifyId(), request.songName(), request.songArtist(), request.songCoverArt());
+        entryService.createEntry(user, request.date(), song, Optional.ofNullable(request.note()));
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -51,7 +53,9 @@ public class EntryController {
     public Entry updateEntry(@AuthenticationPrincipal OAuth2User principal, @PathVariable LocalDate date,
             @RequestBody EntryPatchRequest request) {
         User user = resolveUser(principal);
-        return entryService.updateEntry(user, date, Optional.ofNullable(request.spotifyId()), Optional.ofNullable(request.note()));
+        Optional<SongSelection> song = Optional.ofNullable(request.spotifyId())
+                .map(id -> new SongSelection(id, request.songName(), request.songArtist(), request.songCoverArt()));
+        return entryService.updateEntry(user, date, song, Optional.ofNullable(request.note()));
     }
 
     private User resolveUser(OAuth2User principal) {
@@ -62,11 +66,17 @@ public class EntryController {
     private record EntryPostRequest(
             @JsonProperty("date") LocalDate date,
             @JsonProperty("spotify_id") String spotifyId,
+            @JsonProperty("song_name") String songName,
+            @JsonProperty("song_artist") String songArtist,
+            @JsonProperty("song_cover_art") String songCoverArt,
             @JsonProperty("note") String note) {
     }
 
     private record EntryPatchRequest(
             @JsonProperty("spotify_id") String spotifyId,
+            @JsonProperty("song_name") String songName,
+            @JsonProperty("song_artist") String songArtist,
+            @JsonProperty("song_cover_art") String songCoverArt,
             @JsonProperty("note") String note) {
     }
 

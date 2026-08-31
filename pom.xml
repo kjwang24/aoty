@@ -28,6 +28,11 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<!-- force java ver in deploy to match java ver in dev -->
+		<node.version>v24.18.0</node.version>
+		<frontend.dir>${project.basedir}/frontend</frontend.dir>
+		<!-- run ./mvnw test -Dskip.frontend=true if you know it's safe to skip the frontend build -->
+		<skip.frontend>false</skip.frontend>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -102,6 +107,65 @@
                     </path>
                 </annotationProcessorPaths>
             </configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.15.1</version>
+				<configuration>
+					<workingDirectory>${frontend.dir}</workingDirectory>
+					<skip>${skip.frontend}</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install-node-and-npm</id>
+						<goals><goal>install-node-and-npm</goal></goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<nodeVersion>${node.version}</nodeVersion>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm-ci</id>
+						<goals><goal>npm</goal></goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<arguments>ci</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm-build</id>
+						<goals><goal>npm</goal></goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<arguments>run build</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- vite output goes directly into jar's static/, builds get sent to target/ -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-frontend-build</id>
+						<goals><goal>copy-resources</goal></goals>
+						<phase>process-resources</phase>
+						<configuration>
+							<skip>${skip.frontend}</skip>
+							<outputDirectory>${project.build.outputDirectory}/static</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${frontend.dir}/dist</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

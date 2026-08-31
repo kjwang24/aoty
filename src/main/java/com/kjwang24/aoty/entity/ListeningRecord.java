@@ -5,7 +5,6 @@ import java.time.Instant;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
-import jakarta.persistence.Column;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,7 +29,6 @@ public class ListeningRecord {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(unique = true)
     private String spotifyId;
 
     private String songName;

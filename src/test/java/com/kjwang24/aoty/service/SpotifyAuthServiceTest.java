@@ -2,7 +2,7 @@ package com.kjwang24.aoty.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,12 +41,13 @@ public class SpotifyAuthServiceTest {
         when(spotifyCredentialRepository.save(any(SpotifyCredential.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Instant expiration = Instant.now();
-        spotifyAuthService.handleLogin("kjwang24", "katherine", "access", "refresh", expiration);
+        spotifyAuthService.handleLogin("kjwang24", "katherine", "http://pfp", "access", "refresh", expiration);
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(userCaptor.capture());
+        verify(userRepository, atLeastOnce()).save(userCaptor.capture());
         assertThat(userCaptor.getValue().getAccountId()).isEqualTo("kjwang24");
         assertThat(userCaptor.getValue().getDisplayName()).isEqualTo("katherine");
+        assertThat(userCaptor.getValue().getPfpUrl()).isEqualTo("http://pfp");
 
         ArgumentCaptor<SpotifyCredential> credCaptor = ArgumentCaptor.forClass(SpotifyCredential.class);
         verify(spotifyCredentialRepository).save(credCaptor.capture());
@@ -67,13 +68,14 @@ public class SpotifyAuthServiceTest {
         cred.setRefreshToken("oldrefresh");
 
         when(userRepository.findByAccountId("kjwang24")).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(spotifyCredentialRepository.findByUser(user)).thenReturn(Optional.of(cred));
         when(spotifyCredentialRepository.save(any(SpotifyCredential.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Instant expiration = Instant.now();
-        spotifyAuthService.handleLogin("kjwang24", "katherine", "newaccess", "newrefresh", expiration);
+        spotifyAuthService.handleLogin("kjwang24", "katherine", "http://pfp", "newaccess", "newrefresh", expiration);
 
-        verify(userRepository, never()).save(any(User.class));
+        assertThat(user.getPfpUrl()).isEqualTo("http://pfp");
 
         ArgumentCaptor<SpotifyCredential> credCaptor = ArgumentCaptor.forClass(SpotifyCredential.class);
         verify(spotifyCredentialRepository).save(credCaptor.capture());
