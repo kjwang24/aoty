@@ -29,9 +29,6 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                               .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
             .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-            // The login screen is itself part of the React bundle, so the shell and its assets
-            // have to be reachable while logged out — otherwise the first request redirects
-            // straight into Spotify and the user never sees the app's own login page.
             .authorizeHttpRequests(auth -> auth.requestMatchers("/oauth2/**", "/login/**").permitAll()
                                                .requestMatchers("/", "/index.html", "/assets/**",
                                                                 "/favicon.svg", "/error").permitAll()

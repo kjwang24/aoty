@@ -1,0 +1,7 @@
+target/
+.git/
+*.md
+frontend/node
+frontend/node_modules
+frontend/dist
+.env
