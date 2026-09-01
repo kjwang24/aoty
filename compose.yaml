@@ -1,7 +1,14 @@
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m" # cap at 30 mb
+    max-file: "3"
+
 services:
   db:
     image: postgres:17-alpine
     restart: unless-stopped
+    logging: *logging
     environment:
       POSTGRES_DB: aoty
       POSTGRES_USER: aoty
@@ -18,6 +25,7 @@ services:
     image: ghcr.io/kjwang24/aoty:latest
     build: .
     restart: unless-stopped
+    logging: *logging
     environment:
       SPRING_PROFILES_ACTIVE: production
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/aoty
@@ -32,6 +40,7 @@ services:
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
+    logging: *logging
     ports:
       - "80:80"
       - "443:443"
@@ -46,9 +55,3 @@ volumes:
   pgdata:
   caddy_data:
   caddy_config:
-
-logging:
-  driver: json-file
-  options:
-    max-size: "10m"
-    max-file: "3"
