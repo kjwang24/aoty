@@ -32,29 +32,29 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:latest
             ${{ env.IMAGE }}:${{ github.sha }}
-          # persist docker layers
-          cache-from: type=gha
+          cache-from: type=gha # reuse docker layers when possible
           cache-to: type=gha,mode=max
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # to request oidc token
+      contents: read
     steps:
       - uses: aws-actions/configure-aws-credentials@v4
-        with:
-        # need to expand ssh beyond personal ip
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        with: # need to expand ssh beyond personal ip
+          role-to-assume: arn:aws:iam::337139236737:role/github-actions-aoty
           aws-region: us-east-2
 
-      - name: Record runner IP
+      - name: record runner ip
         run: echo "RUNNER_IP=$(curl -s https://checkip.amazonaws.com)" >> $GITHUB_ENV
 
-      - name: Open SSH
+      - name: open ssh
         run: |
           aws ec2 authorize-security-group-ingress \
             --group-id ${{ secrets.SG_ID }} \
-            --protocol tcp --port 22 --cidr ${{ env.RUNNER_IP }}/32
+            --protocol tcp --port 22 --cidr "$RUNNER_IP/32"
 
       - uses: appleboy/ssh-action@v1
         with:
@@ -68,9 +68,9 @@ jobs:
             docker compose up -d
             docker image prune -f
 
-      - name: Close SSH
+      - name: close ssh
         if: always()
         run: |
           aws ec2 revoke-security-group-ingress \
             --group-id ${{ secrets.SG_ID }} \
-            --protocol tcp --port 22 --cidr ${{ env.RUNNER_IP }}/32
+            --protocol tcp --port 22 --cidr "$RUNNER_IP/32" || true
