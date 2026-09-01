@@ -11,9 +11,10 @@ COPY .mvn/ .mvn/
 RUN ./mvnw -B dependency:go-offline
 COPY src/ src/
 COPY frontend/ frontend/
+RUN ./mvnw -B -DskipTests package
 
 # runtime
-FROM eclipse=temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 RUN adduser -D -H app
 USER app
