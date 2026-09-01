@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE: ghcr.io/<your-github-username>/aoty
+  IMAGE: ghcr.io/kjwang24/aoty
 
 jobs:
   build:
