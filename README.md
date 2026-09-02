@@ -9,6 +9,8 @@ the app will recommend you choices each day based on your recent listening histo
 
 built with spring boot, react, typescript, postgres, and spotify api. containerized with docker, tls certificates managed by caddy, hosted by deSEC, deployed with github actions, running on aws. crucial assists from claude code and impeccable...  
 
+artwork credits to pinterest/[the international art glass catalogue](https://i.pinimg.com/1200x/bc/98/b6/bc98b6cfff1410269fb39304fdb6b0f6.jpg)
+
 ### demo
 
 https://github.com/user-attachments/assets/7cbda074-3237-40f3-8d54-e8474c16cbb6
