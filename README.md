@@ -7,8 +7,7 @@ the app will recommend you choices each day based on your recent listening histo
 
 ### technicalities
 
-built with spring boot, react, typescript, postgres, and spotify api. containerized with docker, tls certificates managed by caddy, deployed with github actions, running on 
-aws. crucial assists from claude code and impeccable...  
+built with spring boot, react, typescript, postgres, and spotify api. containerized with docker, tls certificates managed by caddy, hosted by deSEC, deployed with github actions, running on aws. crucial assists from claude code and impeccable...  
 
 ### demo
 
@@ -16,21 +15,25 @@ https://github.com/user-attachments/assets/7cbda074-3237-40f3-8d54-e8474c16cbb6
 
 ### faq
 
-\+ **q: why can't i change past entries!!**  
-&emsp;a: an entry is just meant to capture how you felt on that day so don't think too hard about it :') do not despair, you can edit  
-&emsp;today's entry up until the end of the day.
+<details>
+  <summary>why can't i change past entries!!</summary>
+    <em>an entry is just meant to capture how you felt on that day so don't think too hard about it :') do not despair, you can edit today's entry up until the end of the 
+    day.</em>
+</details>
 
-\+ **q: how is this different from me curating my own playlist on spotify**  
-&emsp;a: well i learned spring boot during the creation of this app. did i learn spring boot during the creation of spotify? methinks not.  
-&emsp;i probably wasn't even alive  
-&emsp;in all seriousness, part of the website's purpose is to be a vehicle for the idea. most people probably wouldn't think to do this  
-&emsp;without knowing a service existed to help people do it. also, the notetaking feature is distinct. also, here the calendar looks like  
-&emsp;a stained glass window when it's finished.
+<details>
+  <summary>how is this different from me curating my own playlist on spotify?</summary>
+    <em>a: well i learned spring boot during the creation of this app. did i learn spring boot during the creation of spotify? methinks not. i probably wasn't even alive  
+    in all seriousness, part of the website's purpose is to be a vehicle for the idea. most people probably wouldn't think to do this without knowing a service existed to 
+    help people do it. also, the notetaking feature is distinct. also, here the calendar looks like a stained glass window when it's finished.</em>
+</details>
 
-\+ **q: if i edit my playlist in spotify, will my calendar update?**  
-&emsp;a: errr no. first of all i don't think there's any way to force spotify to notify the app when the playlist gets edited. second, it  
-&emsp;defeats the whole "freeze the past" concept. lastly if you only have one entry and you delete it, then add another song, the app  
-&emsp;has no idea which day you want to add that song to, it could be any day in history
+<details>
+  <summary>if i edit my playlist in spotify, will my calendar update?</summary>
+    <em>a: errr no. first of all i don't think there's any way to force spotify to notify the app when the playlist gets edited. second, it defeats the whole "freeze the 
+    past" concept. lastly if you only have one entry and you delete it, then add another song, the app has no idea which day you want to add that song to, it could be any 
+    day in history</em>
+</details>
 
-*thank you for checking out my work!! just a note, if you're here after 11/20/26, https://aoty.dedyn.io won't work anymore, since my 3-month free spotify premium
-trial will have expired, and i am too broketh to pay for an api key*
+*thanks for checking out my work! just a note, if you're here after 11/20/26, https://aoty.dedyn.io won't work anymore, since my 3-month free spotify premium
+trial will have expired and i am too broketh to pay for an api key*
